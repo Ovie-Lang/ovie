@@ -1,0 +1,28 @@
+name: Release Ovie Lang
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build Linux release
+        run: cargo build --release --bin oviec
+      - name: Create release package
+        run: |
+            mkdir -p dist/ovie-linux-x64/bin
+            cp target/release/oviec dist/ovie-linux-x64/bin/
+            cp -r std dist/ovie-linux-x64/
+            cp -r oviev dist/ovie-linux-x64/
+            cp -r docs dist/ovie-linux-x64/
+            cp easy-linux-install.sh dist/ovie-linux-x64/
+            tar -czf ovie-linux-x64.tar.gz -C dist ovie-linux-x64
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ovie-linux-x64.tar.gz
