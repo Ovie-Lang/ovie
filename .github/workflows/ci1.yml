@@ -1,0 +1,27 @@
+name: Ovie Lang CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Build oviec
+        run: cargo build --release --bin oviec
+      - name: Run oviec self-check
+        run: ./target/release/oviec --self-check
+      - name: Test oviev main
+        run: ./target/release/oviec check oviev/src/main.ov
+      - name: Test calculator
+        run: echo q | ./target/release/oviec run calculator.ov
+      - name: Test all keywords
+        run: ./target/release/oviec run oviev/src/tests/test_all.ov
+      - name: Test stdlib
+        run: ./target/release/oviec run oviev/src/tests/test_stdlib.ov
